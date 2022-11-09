@@ -18,6 +18,9 @@ def conv1x1(in_planes, out_planes, stride=1):                                   
     """1x1 convolution"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
+#resnet18都是由BasicBlock组成的，50层及其以上的resnet才有BottleNeck组成，所有类型的resnet卷积操作的通道数（无论是输入通道还是输出通道）都是64的倍数
+#无论哪一种resnet，除了公共部分，都是由4大块组成（con2_x,con3_x,con4_x,con5_x）,每一块的初始通道数都是64，128，256，512
+#两个重要结构：BasicBlock和BottleNeck
 
 class BasicBlock(nn.Module):
     expansion = 1   
@@ -25,6 +28,9 @@ class BasicBlock(nn.Module):
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
                  base_width=64, dilation=1, norm_layer=None, fuse_type='DAF'):
+                      
+                      #参数多了一个fuse_type
+                      
         super(BasicBlock, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -33,12 +39,15 @@ class BasicBlock(nn.Module):
         if dilation > 1:
             raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
         # Both self.conv1 and self.downsample layers downsample the input when stride != 1
-        self.conv1 = conv3x3(inplanes, planes, stride)
+
+        self.conv1 = conv3x3(inplanes, planes, stride)   #第一个conv3*3设置了步长，为2
         self.bn1 = norm_layer(planes)
         self.relu = nn.ReLU(inplace=True)
-        self.conv2 = conv3x3(planes, planes)
+        self.conv2 = conv3x3(planes, planes)      #第二个没有设置步长，默认为1
         self.bn2 = norm_layer(planes)
         self.downsample = downsample
+#resnet里的downsample就是用一个1*1的卷积核处理，变成想要的通道数
+#在默认情况下，downsample=None，因为最后x要和output相加，通道不同相加不了，所以downsample是专门用来改变通道数使其一致的
         self.stride = stride
 
         if fuse_type == 'AFF':
@@ -60,11 +69,13 @@ class BasicBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
+#如果上一个ResidualBlock的输出维度和当前的ResidualBlock的维度不一样，那就对这个x进行downSample操作
         if self.downsample is not None:
             identity = self.downsample(x)
-
-        # out += identity
-        out = self.fuse_mode(out, identity)
+                      
+#改变在这里
+        # out += identity   原来的resnet
+        out = self.fuse_mode(out, identity)  #现在的连接
         out = self.relu(out)
 
         return out
