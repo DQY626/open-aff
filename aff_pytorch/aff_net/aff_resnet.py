@@ -6,6 +6,7 @@ __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152', 'resnext50_32x4d', 'resnext101_32x8d',
            'wide_resnet50_2', 'wide_resnet101_2']
 
+#在pytorch的resnet模块在torchvision的models中。由于resnet中的卷积核不是1*1，就是3*3，所以首先定义了这两个卷积核的操作
 
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):                         #卷积核为3*3
     """3x3 convolution with padding"""
@@ -19,7 +20,8 @@ def conv1x1(in_planes, out_planes, stride=1):                                   
 
 
 class BasicBlock(nn.Module):
-    expansion = 1    #expansion是残差结构中输出维度是输入维度的多少倍，BasicBlock没有升维，所以expansion = 1，残差结构是在求和之后才经过ReLU层
+    expansion = 1   
+#expansion是残差结构中输出维度是输入维度的多少倍，BasicBlock没有升维，所以expansion = 1，残差结构是在求和之后才经过ReLU层
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
                  base_width=64, dilation=1, norm_layer=None, fuse_type='DAF'):
