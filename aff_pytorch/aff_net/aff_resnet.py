@@ -9,13 +9,13 @@ __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
 #在pytorch的resnet模块在torchvision的models中。由于resnet中的卷积核不是1*1，就是3*3，
 #所以首先定义了这两个卷积核的操作
 
-def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):                         #卷积核为3*3
+def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):    #卷积核为3*3
     """3x3 convolution with padding"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=dilation, groups=groups, bias=False, dilation=dilation)
 
 
-def conv1x1(in_planes, out_planes, stride=1):                                               #卷积核为1*1
+def conv1x1(in_planes, out_planes, stride=1):                          #卷积核为1*1
     """1x1 convolution"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
